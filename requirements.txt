@@ -1,0 +1,6 @@
+#telethon
+pydantic
+pydantic-settings
+gspread
+oauth2client
+aiogram
