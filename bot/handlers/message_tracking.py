@@ -18,7 +18,8 @@ async def read_messages(message: Message):
     if 0 <= now.hour < 12:
         if user_info["user_id"] not in cache_morning:
             cache_morning[user_info["user_id"]] = user_info
-    else:
+            
+    elif 15 <= now.hour <= 23:
         if user_info["user_id"] not in cache_evening:
             cache_evening[user_info["user_id"]] = user_info
 
