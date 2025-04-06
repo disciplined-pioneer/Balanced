@@ -25,16 +25,19 @@ async def reporter_loop():
     while True:
         now = datetime.now()
 
+        # Обрабатываем утро
         if 0 <= now.hour < 12:
             await wait_until(12, 1)
+            users = dict(cache_morning)
+            cache_morning.clear()
+            period = "УТРО (00:01 – 12:00)"
+
+        # Обрабатываем вечер
+        else:
+            await wait_until(0, 1)
             users = dict(cache_evening)
             cache_evening.clear()
             period = "НОЧЬ (12:01 – 00:00)"
-        else:
-            await wait_until(0, 1)
-            users = dict(cache_morning)
-            cache_morning.clear()
-            period = "ДЕНЬ (00:01 – 12:00)"
 
         print(f"\n[{period}] Пользователи, написавшие впервые за период:")
         if users:
