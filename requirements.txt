@@ -1,4 +1,3 @@
-#telethon
 pydantic
 pydantic-settings
 gspread
