@@ -19,10 +19,13 @@ async def main():
 
 
 if __name__ == "__main__":
+    
     try:
         print("\nБот запущен ✅\n")
         asyncio.run(main())
+
     except KeyboardInterrupt:
         print("\n🛑 Бот остановлен 🛑\n")
+
     except Exception as e:
         print(f"\n❌ Возникла ошибка : {e}\n")

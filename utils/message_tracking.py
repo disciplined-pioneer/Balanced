@@ -1,12 +1,14 @@
 import asyncio
-from datetime import datetime, timedelta
 from cachetools import TTLCache
+from aiogram.types import Message
+from datetime import datetime, timedelta
 
 
 # Кэши: дневной и ночной
 CACHE_TTL_SECONDS = 12 * 60 * 60  # 12 часов
-cache_day = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
-cache_night = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
+
+cache_morning = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
+cache_evening = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
 
 
 # Асинхронный помощник: ждет до нужного времени
@@ -25,13 +27,13 @@ async def reporter_loop():
 
         if 0 <= now.hour < 12:
             await wait_until(12, 1)
-            users = dict(cache_day)
-            cache_day.clear()
+            users = dict(cache_evening)
+            cache_evening.clear()
             period = "НОЧЬ (12:01 – 00:00)"
         else:
             await wait_until(0, 1)
-            users = dict(cache_night)
-            cache_night.clear()
+            users = dict(cache_morning)
+            cache_morning.clear()
             period = "ДЕНЬ (00:01 – 12:00)"
 
         print(f"\n[{period}] Пользователи, написавшие впервые за период:")
@@ -42,3 +44,12 @@ async def reporter_loop():
             print(" - Никто не писал")
         print()
 
+
+# Получение имени пользователя и его username
+def get_user_info(message: Message):
+    username = f"@{message.from_user.username}" if message.from_user.username else "[без username]"
+    return {
+        "username": username,
+        "user_id": message.from_user.id,
+        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }

@@ -10,16 +10,6 @@ from utils.message_tracking import *
 router = Router()
 
 
-# Получение имени пользователя и его username
-def get_user_info(message: Message):
-    username = f"@{message.from_user.username}" if message.from_user.username else "[без username]"
-    return {
-        "username": username,
-        "user_id": message.from_user.id,
-        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-
-
 # Обработка входящих сообщений из супергрупп
 @router.message(F.chat.type == ChatType.SUPERGROUP)
 async def read_messages(message: Message):
@@ -27,10 +17,10 @@ async def read_messages(message: Message):
     now = datetime.now()
 
     if 0 <= now.hour < 12:
-        if user_info["user_id"] not in cache_night:
-            cache_night[user_info["user_id"]] = user_info
+        if user_info["user_id"] not in cache_morning:
+            cache_morning[user_info["user_id"]] = user_info
     else:
-        if user_info["user_id"] not in cache_day:
-            cache_day[user_info["user_id"]] = user_info
+        if user_info["user_id"] not in cache_evening:
+            cache_evening[user_info["user_id"]] = user_info
 
-    print(f"[{user_info['timestamp']}] {user_info['username']}: {message.text or '[не текстовое сообщение]'}")
+    print(f"[{user_info['timestamp']}] {user_info['username']} ({user_info['user_id']}): {message.text or '[не текстовое сообщение]'}")
