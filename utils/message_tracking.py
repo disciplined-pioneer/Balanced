@@ -4,7 +4,7 @@ from aiogram.types import Message
 from datetime import datetime, timedelta
 
 # Время жизни кэшей — сутки (так как проверка раз в день)
-CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часа
+CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часов
 
 cache_morning = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
 cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
@@ -46,7 +46,7 @@ async def reporter_loop():
                 print(f" - {user_info['username']} (ID: {user_info['user_id']}) | Время: {user_info['timestamp']}")
         else:
             print(" - Никто не писал")
-        cache_morning.clear()
+        
 
         # Вечер: 15:00 – 00:00
         if cache_evening:
@@ -54,5 +54,8 @@ async def reporter_loop():
                 print(f" - {user_info['username']} (ID: {user_info['user_id']}) | Время: {user_info['timestamp']}")
         else:
             print(" - Никто не писал")
+        
+        cache_morning.clear()
         cache_evening.clear()
+
         print()
