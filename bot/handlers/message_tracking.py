@@ -22,5 +22,5 @@ async def read_messages(message: Message):
     elif 15 <= now.hour <= 23:
         if user_info["user_id"] not in cache_evening:
             cache_evening[user_info["user_id"]] = user_info
-
+            
     print(f"[{user_info['timestamp']}] {user_info['username']} ({user_info['user_id']}): {message.text or '[не текстовое сообщение]'}")

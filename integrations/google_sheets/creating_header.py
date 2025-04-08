@@ -23,7 +23,7 @@ def day_week_name(date: datetime) -> str:
 
 
 # Записываем шапочку
-def write_header(worksheet, col_index: int) -> None:
+def write_header(worksheet, col_index: int) -> int:
 
     # Определяем дату и день недели
     current_time = datetime.now()
@@ -42,6 +42,8 @@ def write_header(worksheet, col_index: int) -> None:
     worksheet.update_cell(4, col_index, "Утро")
     worksheet.update_cell(4, col_index+1, "Вечер")
 
+    return col_index
+
 
 # Применяем стиль к диапазону (границы, фон, шрифт)
 def apply_style(
@@ -52,6 +54,7 @@ def apply_style(
         borders: Optional[Dict[str, Dict[str, int]]] = None,
         text_format: Optional[Dict[str, Optional[bool]]]=None
     ) -> None:
+
     start_cell = rowcol_to_a1(start_row, start_col)
     end_cell = rowcol_to_a1(end_row, end_col)
 
@@ -64,14 +67,14 @@ def apply_style(
 
 
 # Функция для создания шапочки с применением стилей
-def create_header_and_apply_styles(worksheet) -> None:
+def create_header_and_apply_styles(worksheet) -> int:
 
     # Получаем индекс колонки для добавления
     row_values = worksheet.row_values(3)
     now_number_col = len(row_values) + 2
 
     # Создаем шапочку
-    write_header(worksheet, now_number_col)
+    col_date_index = write_header(worksheet, now_number_col)
 
     # Применяем стиль: Границы
     borders = {
@@ -91,3 +94,45 @@ def create_header_and_apply_styles(worksheet) -> None:
     apply_style(worksheet, 1, now_number_col, 1, now_number_col+1, background_color=background_color)
 
     print("Шапочка создана и стиль применен успешно.")
+
+    return col_date_index
+
+
+# Функция для поиска строки по значению в указанной колонке.
+def find_row_by_value(sheet, column_num: int, value: int):
+
+    # Получаем все значения в указанной колонке
+    column_values = sheet.col_values(column_num)
+    
+    # Проходим по значениям в колонке
+    for row_id, cell_value in enumerate(column_values, start=1):
+        if cell_value == value:
+            return row_id  # Возвращаем номер строки, если значение найдено
+
+    return None  # Если значение не найдено, возвращаем None
+
+
+# Применяем жирный и черный цвет для всей колонки G
+def style_columns(worksheet, col_date_index):
+    
+    apply_style(
+        worksheet, 
+        start_row=1, start_col=7, 
+        end_row=worksheet.row_count, end_col=7,
+        text_format={'bold': True, 'foregroundColor': {'red': 0, 'green': 0, 'blue': 0}}  # черный цвет
+    )
+    
+    # Применяем НЕ жирный и черный цвет для колонки col_date_index и col_date_index + 1
+    apply_style(
+        worksheet, 
+        start_row=1, start_col=col_date_index, 
+        end_row=worksheet.row_count, end_col=col_date_index,
+        text_format={'fontFamily': 'Calibri', 'bold': False, 'foregroundColor': {'red': 0, 'green': 0, 'blue': 0}}  # черный цвет
+    )
+
+    apply_style(
+        worksheet, 
+        start_row=1, start_col=col_date_index + 1, 
+        end_row=worksheet.row_count, end_col=col_date_index + 1,
+        text_format={'fontFamily': 'Calibri', 'bold': False, 'foregroundColor': {'red': 0, 'green': 0, 'blue': 0}}  # черный цвет
+    )

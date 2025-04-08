@@ -4,10 +4,10 @@ from aiogram.types import Message
 from datetime import datetime, timedelta
 
 # Время жизни кэшей — сутки (так как проверка раз в день)
-CACHE_TTL_SECONDS = 24 * 60 * 60  # 24 часа
+CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часа
 
-cache_morning = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
-cache_evening = TTLCache(maxsize=10000, ttl=CACHE_TTL_SECONDS)
+cache_morning = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
+cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
 
 # Ожидание до 00:01
 async def wait_until_midnight():
@@ -16,6 +16,16 @@ async def wait_until_midnight():
     if future <= now:
         future += timedelta(days=1)
     await asyncio.sleep((future - now).total_seconds())
+
+
+# Получение имени пользователя и его username
+def get_user_info(message: Message):
+    username = f"@{message.from_user.username}" if message.from_user.username else "[без username]"
+    return {
+        "username": username,
+        "user_id": message.from_user.id,
+        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
 
 
 # Главный цикл репортера, запускается раз в сутки
@@ -46,13 +56,3 @@ async def reporter_loop():
             print(" - Никто не писал")
         cache_evening.clear()
         print()
-
-
-# Получение имени пользователя и его username
-def get_user_info(message: Message):
-    username = f"@{message.from_user.username}" if message.from_user.username else "[без username]"
-    return {
-        "username": username,
-        "user_id": message.from_user.id,
-        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
