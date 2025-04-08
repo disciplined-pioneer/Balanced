@@ -58,8 +58,8 @@ def list_all_participants() -> list:
     return combined
 
 
-# Функция для получения информации о новых учениках по индексу.
-def get_new_students(total_added_ids: list) -> list:
+# Функция для получения информации обб учениках по индексу.
+def get_students(total_added_ids: list) -> list:
 
     # Все ученики в листе "Ученики"
     info_users = list_all_participants()
@@ -108,7 +108,7 @@ def update_habits_and_ids(cache_morning, cache_evening):
     total_added_ids.extend(added_ids_evening)
 
     # Получаем информацию о новых участниках и добавляем в таблицу
-    info_new_users = get_new_students(total_added_ids)
+    info_new_users = get_students(total_added_ids)
     if info_new_users:
         sorted_info_new_users = sorted(info_new_users, key=lambda user: [str(i[0]) for i in all_user_ids_values].index(user[3]))
         habits.update(range_name=f'D{len(all_col_G)+1}', values=sorted_info_new_users)
