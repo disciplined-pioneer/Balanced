@@ -4,6 +4,7 @@ from integrations.google_sheets.google_sheets import authorize_spreadsheet
 from integrations.google_sheets.creating_header import create_header_and_apply_styles
 
 
+
 # Добавляет в all_id недостающие user_id из cache.
 def merge_ids_from_cache(cache: dict, all_id: dict) -> dict:
     existing_ids = set(all_id.values())

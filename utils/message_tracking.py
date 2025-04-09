@@ -2,13 +2,15 @@ import asyncio
 from cachetools import TTLCache
 from aiogram.types import Message
 from datetime import datetime, timedelta
-from integrations.google_sheets.google_sheets import filling_table
+from integrations.google_sheets.accrual_fines_users import accrual_fines_users
+from integrations.google_sheets.scoring import update_habits_and_ids
 
 # Время жизни кэшей — сутки (так как проверка раз в день)
 CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часов
 
 cache_morning = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
 cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
+
 
 # Ожидание до 00:01
 async def wait_until_midnight():
@@ -27,6 +29,13 @@ def get_user_info(message: Message):
         "user_id": message.from_user.id,
         "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
+
+
+# Функция для заполнения всей таблицы
+def filling_table(cache_morning: dict, cache_evening: dict):
+    
+    all_user_ids = update_habits_and_ids(cache_morning, cache_evening)
+    accrual_fines_users(all_user_ids)
 
 
 # Главный цикл репортера, запускается раз в сутки
