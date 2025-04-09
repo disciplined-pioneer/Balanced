@@ -3,11 +3,9 @@
 Этот бот считывает сообщения из группы Telegram и записывает их в таблицу Google Sheets. В проекте используются API Telegram и Google Sheets.
 
 
-
-
 ## Настройка
 
-1. # Инструкция по получению "service_account.json" и настройке Console Cloud Google
+### 1. Инструкция по получению "service_account.json" и настройке Console Cloud Google
 
 1) Чтобы правильно настроить Console Cloud Google Вам необходимо выполнить каждый шаг из этой инструкции (ссылка: https://habr.com/ru/articles/778512/) -> получите service_account.json
 2) Включите Google Sheets API
