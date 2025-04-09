@@ -3,6 +3,7 @@ from itertools import zip_longest
 from integrations.google_sheets.google_sheets import authorize_spreadsheet
 from integrations.google_sheets.creating_header import create_header_and_apply_styles
 
+
 # Добавляет в all_id недостающие user_id из cache.
 def merge_ids_from_cache(cache: dict, all_id: dict) -> dict:
     existing_ids = set(all_id.values())
@@ -29,7 +30,7 @@ def update_presence_history(all_user_ids: dict, cache: dict) -> dict:
 
 
 # Преобразует число в букву
-def number_to_excel_column(n):
+def number_to_excel_column(n: int) -> str:
     column = ""
     while n > 0:
         n -= 1
@@ -58,7 +59,7 @@ def list_all_participants() -> list:
     return combined
 
 
-# Функция для получения информации обб учениках по индексу.
+# Функция для получения информации об учениках по индексу.
 def get_students(total_added_ids: list) -> list:
 
     # Все ученики в листе "Ученики"
@@ -75,10 +76,15 @@ def get_students(total_added_ids: list) -> list:
 
 
 # Функция для начисления баллов
-def update_habits_and_ids(cache_morning, cache_evening):
+def update_habits_and_ids(cache_morning: dict, cache_evening: dict) -> dict:
 
-    # Создаем шапочку и применяем стили
+    # Добавляем новых участников
     habits = authorize_spreadsheet("habits")
+    all_participants = list_all_participants()
+    habits.update(range_name=f'D5', values=all_participants)
+
+    
+    # Создаем шапочку и применяем стили
     col_date_index = create_header_and_apply_styles(habits)
 
     # Получаем все id в таблице

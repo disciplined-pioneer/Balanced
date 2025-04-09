@@ -1,6 +1,4 @@
-from integrations.google_sheets.scoring import update_habits_and_ids
-from integrations.google_sheets.accrual_fines_users import accrual_fines_users
-
+from integrations.google_sheets.google_sheets import filling_table
 
 def main() -> None:
 
@@ -28,7 +26,6 @@ def main() -> None:
         24: {'name': 'Роман', 'score': 55, "username": None},
         5: {'name': 'Наталья', 'score': 95, "username": "@natasha"},  # Повтор с morning
         17: {'name': 'Юлия', 'score': 72, "username": None},
-        18: {'name': 'Светлана', 'score': 77, "username": None},
         47: {'name': 'Александр', 'score': 90, "username": "@alexandr"},
         19: {'name': 'Владимир', 'score': 60, "username": None},
         20: {'name': 'Алексей', 'score': 76, "username": "@alexey"}  # Повтор с morning
@@ -37,17 +34,13 @@ def main() -> None:
     
     try:
         
-        # Заполняем все ячейки данными
-       all_user_ids = update_habits_and_ids(cache_morning, cache_evening)
-       for key, value in all_user_ids.items():
-           print(key, value)
-       accrual_fines_users(all_user_ids)
+        filling_table(cache_morning, cache_evening)
 
     except Exception as e:
         print(f"\nПроизошла ошибка: {e}\n")
 
     end = time.time()
-    print(f"код работал: {end - start}")
+    print(f"код работал: {(end - start):.2f}")
 
 if __name__ == "__main__":
     main()

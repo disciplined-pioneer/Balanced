@@ -2,6 +2,7 @@ import asyncio
 from cachetools import TTLCache
 from aiogram.types import Message
 from datetime import datetime, timedelta
+from integrations.google_sheets.google_sheets import filling_table
 
 # Время жизни кэшей — сутки (так как проверка раз в день)
 CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часов
@@ -47,7 +48,6 @@ async def reporter_loop():
         else:
             print(" - Никто не писал")
         
-
         # Вечер: 15:00 – 00:00
         if cache_evening:
             for user_info in cache_evening.values():
@@ -55,6 +55,15 @@ async def reporter_loop():
         else:
             print(" - Никто не писал")
         
+        # Заполнение всей таблицы и очистка кеша
+        try:
+            morning_data = {user_info['user_id']: user_info for user_info in cache_morning.values()}
+            evening_data = {user_info['user_id']: user_info for user_info in cache_evening.values()}
+            filling_table(morning_data, evening_data)
+
+        except Exception as e:
+            print(f"\nПроизошла ошибка: {e}\n")
+
         cache_morning.clear()
         cache_evening.clear()
 
