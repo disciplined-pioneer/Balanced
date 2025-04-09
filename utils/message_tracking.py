@@ -2,8 +2,10 @@ import asyncio
 from cachetools import TTLCache
 from aiogram.types import Message
 from datetime import datetime, timedelta
-from integrations.google_sheets.accrual_fines_users import accrual_fines_users
+
 from integrations.google_sheets.scoring import update_habits_and_ids
+from integrations.google_sheets.accrual_fines_users import accrual_fines_users
+
 
 # Время жизни кэшей — сутки (так как проверка раз в день)
 CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часов
@@ -15,7 +17,7 @@ cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
 # Ожидание до 00:01
 async def wait_until_midnight():
     now = datetime.now()
-    future = now.replace(hour=0, minute=1, second=0, microsecond=0)
+    future = now.replace(hour=18, minute=35, second=0, microsecond=0)
     if future <= now:
         future += timedelta(days=1)
     await asyncio.sleep((future - now).total_seconds())
@@ -33,9 +35,13 @@ def get_user_info(message: Message):
 
 # Функция для заполнения всей таблицы
 def filling_table(cache_morning: dict, cache_evening: dict):
-    
+    print('-'*40)
+    print('Заполняем данные...')
     all_user_ids = update_habits_and_ids(cache_morning, cache_evening)
+    print('Баллы были начислены')
     accrual_fines_users(all_user_ids)
+    print('Штрафы были начислены')
+    print('-'*40)
 
 
 # Главный цикл репортера, запускается раз в сутки
@@ -49,20 +55,6 @@ async def reporter_loop():
         # 5 = суббота, 6 = воскресенье — пропускаем
         if weekday >= 5:
             continue
-
-        # Утро: 00:01 – 12:00
-        if cache_morning:
-            for user_info in cache_morning.values():
-                print(f" - {user_info['username']} (ID: {user_info['user_id']}) | Время: {user_info['timestamp']}")
-        else:
-            print(" - Никто не писал")
-        
-        # Вечер: 15:00 – 00:00
-        if cache_evening:
-            for user_info in cache_evening.values():
-                print(f" - {user_info['username']} (ID: {user_info['user_id']}) | Время: {user_info['timestamp']}")
-        else:
-            print(" - Никто не писал")
         
         # Заполнение всей таблицы и очистка кеша
         try:
