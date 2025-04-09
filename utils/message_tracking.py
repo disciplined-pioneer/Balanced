@@ -17,7 +17,7 @@ cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
 # Ожидание до 00:01
 async def wait_until_midnight():
     now = datetime.now()
-    future = now.replace(hour=18, minute=35, second=0, microsecond=0)
+    future = now.replace(hour=0, minute=1, second=0, microsecond=0)
     if future <= now:
         future += timedelta(days=1)
     await asyncio.sleep((future - now).total_seconds())
