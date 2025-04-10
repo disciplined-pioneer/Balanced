@@ -23,6 +23,6 @@ async def read_messages(message: Message):
         if user_info["user_id"] not in cache_evening:
             cache_evening[user_info["user_id"]] = user_info
             
-    print(f"[{user_info['timestamp']}] {user_info['username']} ({user_info['user_id']}): {message.text or '[не текстовое сообщение]'}")
+    """print(f"[{user_info['timestamp']}] {user_info['username']} ({user_info['user_id']}): {message.text or '[не текстовое сообщение]'}")
     evening_data = {user_info['user_id']: user_info for user_info in cache_evening.values()}
-    print(evening_data)
+    print(evening_data)"""
