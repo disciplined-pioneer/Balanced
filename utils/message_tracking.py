@@ -1,17 +1,16 @@
 import asyncio
-from cachetools import TTLCache
 from aiogram.types import Message
 from datetime import datetime, timedelta
 
 from integrations.google_sheets.scoring import update_habits_and_ids
 from integrations.google_sheets.accrual_fines_users import accrual_fines_users
 
+# Используем обычные словари
+cache_morning = {}
+cache_evening = {}
 
-# Время жизни кэшей — сутки (так как проверка раз в день)
-CACHE_TTL_SECONDS = 25 * 60 * 60  # 25 часов
-
-cache_morning = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
-cache_evening = TTLCache(maxsize=100_000, ttl=CACHE_TTL_SECONDS)
+# Храним время последней очистки
+last_clear_time = datetime.now()
 
 
 # Ожидание до 00:01
@@ -46,14 +45,23 @@ def filling_table(cache_morning: dict, cache_evening: dict):
 
 # Главный цикл репортера, запускается раз в сутки
 async def reporter_loop():
+    global last_clear_time
+
     while True:
         await wait_until_midnight()
-        
+
+        # Проверка — не прошло ли 25 часов с момента последней очистки
+        if datetime.now() - last_clear_time >= timedelta(hours=25):
+            cache_morning.clear()
+            cache_evening.clear()
+            last_clear_time = datetime.now()
+            print('Прошло 25 часов — кеш очищен')
+
         # Определяем день недели вчерашнего дня
         yesterday = datetime.now() - timedelta(days=1)
         yesterday_weekday = yesterday.weekday()
 
-        # Если вчера была суббота или воскресенье — просто чистим кеш и пропускаем
+        # Если вчера была суббота или воскресенье — пропускаем обработку
         if yesterday_weekday >= 5:
             cache_morning.clear()
             cache_evening.clear()
@@ -66,9 +74,3 @@ async def reporter_loop():
 
         except Exception as e:
             print(f"\nПроизошла ошибка: {e}\n")
-
-        cache_morning.clear()
-        cache_evening.clear()
-
-        print()
-
