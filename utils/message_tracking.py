@@ -49,14 +49,16 @@ async def reporter_loop():
     while True:
         await wait_until_midnight()
         
-        now = datetime.now()
-        weekday = now.weekday()
+        # Определяем день недели вчерашнего дня
+        yesterday = datetime.now() - timedelta(days=1)
+        yesterday_weekday = yesterday.weekday()
 
-        # 5 = суббота, 6 = воскресенье — пропускаем
-        if weekday >= 5:
+        # Если вчера была суббота или воскресенье — просто чистим кеш и пропускаем
+        if yesterday_weekday >= 5:
+            cache_morning.clear()
+            cache_evening.clear()
             continue
         
-        # Заполнение всей таблицы и очистка кеша
         try:
             morning_data = {user_info['user_id']: user_info for user_info in cache_morning.values()}
             evening_data = {user_info['user_id']: user_info for user_info in cache_evening.values()}
@@ -69,3 +71,4 @@ async def reporter_loop():
         cache_evening.clear()
 
         print()
+
