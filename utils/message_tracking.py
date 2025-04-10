@@ -9,9 +9,6 @@ from integrations.google_sheets.accrual_fines_users import accrual_fines_users
 cache_morning = {}
 cache_evening = {}
 
-# Храним время последней очистки
-last_clear_time = datetime.now()
-
 
 # Ожидание до 00:01
 async def wait_until_midnight():
@@ -45,17 +42,9 @@ def filling_table(cache_morning: dict, cache_evening: dict):
 
 # Главный цикл репортера, запускается раз в сутки
 async def reporter_loop():
-    global last_clear_time
-
+    
     while True:
         await wait_until_midnight()
-
-        # Проверка — не прошло ли 25 часов с момента последней очистки
-        if datetime.now() - last_clear_time >= timedelta(hours=25):
-            cache_morning.clear()
-            cache_evening.clear()
-            last_clear_time = datetime.now()
-            print('Прошло 25 часов — кеш очищен')
 
         # Определяем день недели вчерашнего дня
         yesterday = datetime.now() - timedelta(days=1)
@@ -71,6 +60,10 @@ async def reporter_loop():
             morning_data = {user_info['user_id']: user_info for user_info in cache_morning.values()}
             evening_data = {user_info['user_id']: user_info for user_info in cache_evening.values()}
             filling_table(morning_data, evening_data)
+
+            # Чистим кеш
+            cache_morning.clear()
+            cache_evening.clear()
 
         except Exception as e:
             print(f"\nПроизошла ошибка: {e}\n")
