@@ -1,4 +1,4 @@
-# Balanced_295 -  Telegram бот для записи сообщений в Google Sheets
+# Balanced -  Telegram бот для записи сообщений в Google Sheets
 
 Этот бот считывает сообщения из группы Telegram и записывает их в таблицу Google Sheets. В проекте используются API Telegram и Google Sheets.
 
